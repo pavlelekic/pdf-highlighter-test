@@ -1,29 +1,37 @@
-// src/workers/pdfSearch.worker.js
-import * as pdfjsLib from "pdfjs-dist/build/pdf";
-import workerSrc from "pdfjs-dist/build/pdf.worker?worker";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+// Set the worker source - the warning is expected when using PDF.js inside a worker
+// It will use a "fake worker" (synchronous) which is fine for our use case
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
 
 // --------------------------------------------------
 // Extract text + mapping
 // --------------------------------------------------
 async function extractPages(buffer) {
-  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-  const pages = [];
+  try {
+    const pdf = await pdfjsLib.getDocument({
+      data: buffer,
+    }).promise;
+    const pages = [];
 
-  for (let n = 1; n <= pdf.numPages; n++) {
-    const page = await pdf.getPage(n);
-    const content = await page.getTextContent();
-    const text = content.items.map((i) => i.str).join("");
+    for (let n = 1; n <= pdf.numPages; n++) {
+      const page = await pdf.getPage(n);
+      const content = await page.getTextContent();
+      const text = content.items.map((i) => i.str).join("");
 
-    pages.push({
-      pageNumber: n,
-      text,
-      items: content.items,
-    });
+      pages.push({
+        pageNumber: n,
+        text,
+        items: content.items,
+      });
+    }
+
+    return pages;
+  } catch (error) {
+    console.error("Error extracting pages:", error);
+    throw error;
   }
-
-  return pages;
 }
 
 // Map every character in entire PDF → item & position
@@ -112,17 +120,29 @@ function matchToRects(match, map) {
 }
 
 onmessage = async (e) => {
-  const { pdfBuffer, searchTerm } = e.data;
+  try {
+    const { pdfBuffer, searchTerm } = e.data;
+    console.log("Worker received search request for:", searchTerm);
 
-  const pages = await extractPages(pdfBuffer);
-  const { fullText, map } = buildCharMap(pages);
-  const occurrences = findOccurrences(fullText, searchTerm);
+    const pages = await extractPages(pdfBuffer);
+    console.log("Pages extracted:", pages.length);
 
-  const highlights = occurrences.map((occ, i) => ({
-    id: `h-${i}`,
-    text: searchTerm,
-    positions: matchToRects(occ, map),
-  }));
+    const { fullText, map } = buildCharMap(pages);
+    console.log("Character map built, total chars:", fullText.length);
 
-  postMessage({ highlights });
+    const occurrences = findOccurrences(fullText, searchTerm);
+    console.log("Occurrences found:", occurrences.length);
+
+    const highlights = occurrences.map((occ, i) => ({
+      id: `h-${i}`,
+      text: searchTerm,
+      positions: matchToRects(occ, map),
+    }));
+
+    console.log("Highlights created:", highlights.length);
+    postMessage({ highlights });
+  } catch (error) {
+    console.error("Worker error:", error);
+    postMessage({ highlights: [], error: error.message });
+  }
 };

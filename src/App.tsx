@@ -23,15 +23,15 @@ export default function PdfDemo() {
     <div
       style={{ width: "100%", height: "100vh", overflow: "auto", padding: 16 }}
     >
-      <button
-        onClick={() =>
-          findHighlights("/sdi.pdf", "your long multi paragraph text")
-        }
-      >
+      <button onClick={() => findHighlights("/sdi.pdf", "This is a quick")}>
         Search
       </button>
       <div style={{ position: "relative", height: "100vh" }}>
-        <PdfLoader url="/sdi.pdf" beforeLoad={<div>Loading PDF...</div>}>
+        <PdfLoader
+          url="/sdi.pdf"
+          beforeLoad={<div>Loading PDF...</div>}
+          workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs"
+        >
           {(pdfDocument) => (
             <PdfHighlighter
               pdfDocument={pdfDocument}
