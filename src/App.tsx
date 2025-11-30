@@ -364,6 +364,14 @@ async function extractPageText(
   const spans: PageSpan[] = [];
   const textSegments: string[] = [];
   let cursor = 0;
+  const isWhitespace = (value: string | null) => !!value && /\s/.test(value);
+  const appendText = (value: string) => {
+    if (!value.length) {
+      return;
+    }
+    textSegments.push(value);
+    cursor += value.length;
+  };
 
   textContent.items.forEach((item) => {
     if (!isTextItem(item)) {
@@ -375,9 +383,16 @@ async function extractPageText(
       return;
     }
 
+    const lastSegment = textSegments[textSegments.length - 1] ?? null;
+    const lastChar = lastSegment ? lastSegment[lastSegment.length - 1] : null;
+    const needsSpacer =
+      cursor > 0 && !isWhitespace(lastChar) && !/^\s/.test(cleaned);
+    if (needsSpacer) {
+      appendText(" ");
+    }
+
     const start = cursor;
-    textSegments.push(cleaned);
-    cursor += cleaned.length;
+    appendText(cleaned);
 
     spans.push({
       pageNumber,
@@ -387,8 +402,7 @@ async function extractPageText(
     });
 
     if (item.hasEOL) {
-      textSegments.push("\n");
-      cursor += 1;
+      appendText("\n");
     }
   });
 
