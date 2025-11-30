@@ -10,10 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "pdfjs-dist": "^4.4.168",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-pdf-highlighter": "^8.0.0-rc.0"
+    "react-pdf-highlighter": "^8.0.0-rc.0",
+    "pdfjs-dist": "4.4.168"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
