@@ -462,27 +462,36 @@ function combineRects(rects: ScaledRect[]): ScaledRect {
       y1: 0,
       x2: 0,
       y2: 0,
-      width: 0,
-      height: 0,
+      width: 1,
+      height: 1,
       pageNumber: 1,
     };
   }
 
-  return rects.reduce<ScaledRect>((acc, rect) => {
-    const x1 = Math.min(acc.x1, rect.x1);
-    const y1 = Math.min(acc.y1, rect.y1);
-    const x2 = Math.max(acc.x2, rect.x2);
-    const y2 = Math.max(acc.y2, rect.y2);
-    return {
-      x1,
-      y1,
-      x2,
-      y2,
-      width: x2 - x1,
-      height: y2 - y1,
-      pageNumber: rect.pageNumber ?? acc.pageNumber,
-    };
-  }, first);
+  const baseWidth = first.width;
+  const baseHeight = first.height;
+  const pageNumber = first.pageNumber;
+
+  return rects.reduce<ScaledRect>(
+    (acc, rect) => ({
+      x1: Math.min(acc.x1, rect.x1),
+      y1: Math.min(acc.y1, rect.y1),
+      x2: Math.max(acc.x2, rect.x2),
+      y2: Math.max(acc.y2, rect.y2),
+      width: baseWidth,
+      height: baseHeight,
+      pageNumber: rect.pageNumber ?? pageNumber,
+    }),
+    {
+      x1: first.x1,
+      y1: first.y1,
+      x2: first.x2,
+      y2: first.y2,
+      width: baseWidth,
+      height: baseHeight,
+      pageNumber,
+    },
+  );
 }
 
 function groupByPage(spans: IndexedSpan[]): IndexedSpan[][] {
@@ -531,8 +540,8 @@ function textItemToRect(
     y1: minY,
     x2: maxX,
     y2: maxY,
-    width: maxX - minX,
-    height: maxY - minY,
+    width: viewport.width,
+    height: viewport.height,
     pageNumber,
   };
 }
