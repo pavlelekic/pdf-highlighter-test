@@ -125,7 +125,7 @@ function App() {
   const handleSearch = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      const normalizedQuery = searchTerm.trim();
+      const normalizedQuery = normalizeSpaces(searchTerm).trim();
       if (
         !indexedDocument ||
         !normalizedQuery ||
@@ -181,7 +181,7 @@ function App() {
           onSubmit={handleSearch}
           style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}
         >
-          <input
+          <textarea
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             placeholder="Paste multi-paragraph text…"
@@ -191,7 +191,10 @@ function App() {
               fontSize: "1rem",
               border: "1px solid #cbd5f5",
               borderRadius: "0.375rem",
+              minHeight: "110px",
+              resize: "vertical",
             }}
+            rows={4}
           />
           <button
             style={buttonStyles}
