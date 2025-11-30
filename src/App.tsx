@@ -22,14 +22,14 @@ import type {
   TextItem,
 } from "pdfjs-dist/types/src/display/api";
 import type { PageViewport } from "pdfjs-dist/types/src/display/display_utils";
-import workerSrc from "pdfjs-dist/build/pdf.worker.mjs?url";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import "react-pdf-highlighter/dist/style.css";
 
 const PDF_URL = "/sdi.pdf";
 const PAGE_BREAK = "\n\n";
 const MIN_QUERY_LENGTH = 2;
 
-GlobalWorkerOptions.workerSrc = workerSrc;
+GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 type ScaledRect = Scaled & { pageNumber: number };
 
