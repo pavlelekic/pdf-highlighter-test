@@ -24,8 +24,9 @@ import type {
 import type { PageViewport } from "pdfjs-dist/types/src/display/display_utils";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import "react-pdf-highlighter/dist/style.css";
+import "./highlight-debug.css";
 
-const PDF_URL = "/sdi.pdf";
+const PDF_URL = "/ai.pdf";
 const PAGE_BREAK = "\n\n";
 const MIN_QUERY_LENGTH = 2;
 
@@ -428,7 +429,6 @@ function findHighlights(index: IndexedDocument, query: string): IHighlight[] {
           pageNumber: pageSpans[0]?.pageNumber ?? 1,
           rects,
           boundingRect,
-          usePdfCoordinates: true,
         },
       });
     });

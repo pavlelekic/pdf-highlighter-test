@@ -1,0 +1,9 @@
+.Highlight__part {
+  outline: 2px solid red !important;
+  outline-offset: 0;
+  box-sizing: border-box;
+}
+
+.Highlight {
+  outline: 1px dashed rgba(255, 0, 0, 0.35);
+}
