@@ -24,7 +24,7 @@ import type {
 import type { PageViewport } from "pdfjs-dist/types/src/display/display_utils";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import "react-pdf-highlighter/dist/style.css";
-import "./highlight-debug.css";
+// import "./highlight-debug.css";
 
 const PDF_URL = "/ai.pdf";
 const PAGE_BREAK = "\n\n";
